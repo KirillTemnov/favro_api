@@ -1,21 +1,26 @@
 require_relative './response'
+require_relative '../inflector'
 
 module FavroApi
   class Request
+    extend Inflector
 
     API_URL = 'https://favro.com/api/v1'.freeze
 
-    ENDPOINTS = {
-      cards:          '/cards',
-      collections:    '/collections',
-      comments:       '/comments',
-      custom_fields:  '/customFields',
-      organizations:  '/organizations',
-      tasks:          '/tasks',
-      tasklists:      '/tasklists',
-      users:          '/users',
-      widgets:        '/widgets'
-    }.freeze
+    METHODS = %i(
+            cards
+            collections
+            comments
+            custom_fields
+            organizations
+            tags
+            tasks
+            tasklists
+            users
+            widgets
+    ).freeze
+
+    ENDPOINTS = METHODS.map{ |m| [m, "/#{jsize(m)}"] }.to_h.freeze
 
     attr_accessor :connection, :url, :endpoint, :params, :method,
       :last_response, :page

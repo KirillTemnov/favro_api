@@ -3,58 +3,15 @@ require_relative './data_types'
 
 module FavroApi
   class Driver
-    def cards(params = {})
-      response = paginated_request(:cards, params).fetch
+    FavroApi::Request::METHODS.each do |m|
+      define_method(m) do |params = {}|
+        response = paginated_request(m, params).fetch
 
-      response.parse(type: FavroApi::DataTypes::Card)
-    end
-
-    def collections(params = {})
-      response = paginated_request(:collections, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Collection)
-    end
-
-    def comments(params = {})
-      response = paginated_request(:comments, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Comment)
-    end
-
-    def custom_fields(params = {})
-      response = paginated_request(:custom_fields, params).fetch
-
-      response.parse
-    end
-
-    def organizations(params = {})
-      response = paginated_request(:organizations, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Organization)
-    end
-
-    def tasks(params = {})
-      response = paginated_request(:tasks, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Task)
-    end
-
-    def tasklists(params = {})
-      response = paginated_request(:tasklists, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Tasklist)
-    end
-
-    def users(params = {})
-      response = paginated_request(:users, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::User)
-    end
-
-    def widgets(params = {})
-      response = paginated_request(:widgets, params).fetch
-
-      response.parse(type: FavroApi::DataTypes::Widget)
+        m == :custom_fields ?
+          response.parse
+        :
+          response.parse(type: Kernel.const_get("FavroApi::DataTypes::#{m.to_s.gsub(%r{s$}im, '').capitalize}"))
+      end
     end
 
     private
