@@ -18,20 +18,22 @@ module FavroApi
             tasklists
             users
             widgets
+            activities
     ).freeze
 
     ENDPOINTS = METHODS.map{ |m| [m, "/#{jsize(m)}"] }.to_h.freeze
 
     attr_accessor :connection, :url, :endpoint, :params, :method,
-      :last_response, :page
+      :last_response, :page, :owner_endpoint
 
     def initialize(options = {})
-      self.url           = options[:url]
-      self.endpoint      = options[:endpoint]
-      self.method        = options[:method] || :get
-      self.params        = options[:params] || {}
-      self.last_response = options[:last_response]
-      self.page          = options[:page]
+      self.url            = options[:url]
+      self.endpoint       = options[:endpoint]
+      self.method         = options[:method] || :get
+      self.params         = options[:params] || {}
+      self.last_response  = options[:last_response]
+      self.page           = options[:page]
+      self.owner_endpoint = options[:owner_endpoint]
     end
 
     def fetch
@@ -53,13 +55,14 @@ module FavroApi
     end
 
     class << self
-      def fetch(endpoint, page: nil, last_response: nil, params: {})
+      def fetch(endpoint, page: nil, last_response: nil, owner_endpoint: nil, params: {})
         new(
-          endpoint:      endpoint,
-          last_response: last_response,
-          page:          page,
-          method:        :get,
-          params:        params
+          endpoint:       endpoint,
+          last_response:  last_response,
+          page:           page,
+          method:         :get,
+          params:         params,
+          owner_endpoint: owner_endpoint
         ).fetch
       end
     end
@@ -71,7 +74,7 @@ module FavroApi
     private
 
     def api_url_for(endpoint)
-      path = ENDPOINTS[endpoint] || raise(ApiError, "Unknown endpoint #{endpoint}")
+      path = (owner_endpoint.to_s + ENDPOINTS[endpoint]) || raise(ApiError, "Unknown endpoint #{endpoint}")
       "#{API_URL}#{path}"
     end
 
