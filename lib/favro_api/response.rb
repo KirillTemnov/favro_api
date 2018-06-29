@@ -15,6 +15,13 @@ module FavroApi
     end
 
     def parse(type: nil)
+      if error?
+        self.entities = []
+        self.pages = 1
+        self.page = 1
+        return self
+      end
+
       self.entities =
         if type
           type.send(:parse, parsed_response['entities'])
