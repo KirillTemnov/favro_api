@@ -45,7 +45,6 @@ module FavroApi
         faraday.params['requestId'] = last_response&.request_id
       end
 
-      puts uri.request_uri
       response = Response.new(response: connection.send(method, uri.request_uri, params))
 
       # if response.error?
